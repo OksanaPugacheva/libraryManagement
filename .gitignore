@@ -31,3 +31,6 @@ Thumbs.db
 # Docker
 *.stackdump
 docker-compose.override.yml
+
+#config.py
+config.py
