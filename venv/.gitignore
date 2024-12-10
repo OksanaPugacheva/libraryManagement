@@ -6,8 +6,10 @@
 *.pyo
 *.pyd
 __pycache__/
-env/
+
+# Виртуальные окружения
 venv/
+env/
 .virtualenv/
 
 # Зависимости
@@ -29,4 +31,3 @@ Thumbs.db
 # Docker
 *.stackdump
 docker-compose.override.yml
-
