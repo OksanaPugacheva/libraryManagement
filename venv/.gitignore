@@ -1,0 +1,32 @@
+# PyCharm
+.idea/
+
+# Python
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+env/
+venv/
+.virtualenv/
+
+# Зависимости
+Pipfile.lock
+poetry.lock
+.env
+
+# Логи
+*.log
+
+# База данных
+*.sqlite3
+*.db
+
+# Системные файлы
+.DS_Store
+Thumbs.db
+
+# Docker
+*.stackdump
+docker-compose.override.yml
+
