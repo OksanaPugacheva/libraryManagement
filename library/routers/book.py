@@ -32,6 +32,17 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
             detail=f"Автор с ID {book.author_id} не найден."
         )
 
+    # Проверка на наличие книги с таким же названием и автором
+    existing_book = db.query(Book).filter(
+        Book.title == book.title,
+        Book.author_id == book.author_id
+    ).first()
+    if existing_book:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Книга с названием '{book.title}' и автором ID {book.author_id} уже существует."
+        )
+
     # Создание новой книги
     new_book = Book(**book.dict())
     db.add(new_book)

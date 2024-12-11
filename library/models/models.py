@@ -1,6 +1,7 @@
-from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Text, DateTime
 from sqlalchemy.orm import relationship
 from library.models.base import Base
+from datetime import datetime
 
 
 class Author(Base):
@@ -28,6 +29,6 @@ class Borrow(Base):
     id = Column(Integer, primary_key=True, index=True)
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
     reader_name = Column(String, nullable=False)
-    borrow_date = Column(Date, nullable=False)
+    borrow_date = Column(DateTime, default=datetime.utcnow, nullable=False)
     return_date = Column(Date, nullable=True)
     book = relationship("Book", back_populates="borrows")
