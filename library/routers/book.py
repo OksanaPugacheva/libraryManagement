@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from library.database import SessionLocal
 from library.models.models import Book, Author
 from library.schemas.book import BookCreate, BookResponse, BookUpdate
 from library.database import get_db
@@ -39,3 +38,83 @@ def create_book(book: BookCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_book)
     return new_book
+
+
+@router.get(
+    "/books/",
+    response_model=List[BookResponse],
+    summary="Получение списка книг",
+    description="Возвращает список всех книг с доступными копиями.",
+)
+def get_books(db: Session = Depends(get_db)):
+    """
+    Возвращает список всех книг.
+    """
+    books = db.query(Book).all()
+    return books
+
+
+@router.get(
+    "/books/{book_id}",
+    response_model=BookResponse,
+    summary="Получение информации о книге",
+    description="Возвращает данные книги по её ID.",
+)
+def get_book(book_id: int, db: Session = Depends(get_db)):
+    """
+    Возвращает данные книги по её ID.
+    """
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Книга с указанным ID не найдена."
+        )
+    return book
+
+
+@router.put(
+    "/books/{book_id}",
+    response_model=BookResponse,
+    summary="Обновление информации о книге",
+    description="Обновляет указанные данные о книге по её ID.",
+)
+def update_book(book_id: int, book_update: BookUpdate, db: Session = Depends(get_db)):
+    """
+    Обновляет данные книги по её ID.
+    """
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Книга с указанным ID не найдена."
+        )
+
+    for key, value in book_update.dict(exclude_unset=True).items():
+        setattr(book, key, value)
+
+    db.commit()
+    db.refresh(book)
+    return book
+
+
+@router.delete(
+    "/books/{book_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Удаление книги",
+    description="Удаляет книгу по её ID.",
+)
+def delete_book(book_id: int, db: Session = Depends(get_db)):
+    """
+    Удаляет книгу по её ID.
+    """
+    book = db.query(Book).filter(Book.id == book_id).first()
+    if not book:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Книга с указанным ID не найдена."
+        )
+
+    db.delete(book)
+    db.commit()
+    return

@@ -1,7 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
-from library.database import SessionLocal
 from library.models.models import Author, Book
 from library.schemas.author import AuthorCreate, AuthorResponse, AuthorUpdate
 from library.database import get_db
@@ -73,7 +72,7 @@ def get_authors(db: Session = Depends(get_db)):
     "/authors/{author_id}",
     response_model=AuthorResponse,  # Возвращаемый объект соответствует модели AuthorResponse
     summary="Получение информации об авторе",
-    description="Возвращает данные автора по его уникальному идентификатору.",
+    description="Возвращает данные автора по его ID.",
     response_description="Данные автора."
 )
 def get_author(author_id: int, db: Session = Depends(get_db)):
@@ -104,7 +103,7 @@ def get_author(author_id: int, db: Session = Depends(get_db)):
     "/authors/{author_id}",
     response_model=AuthorResponse,
     summary="Обновление информации об авторе",
-    description="Обновляет данные автора (имя, фамилию или дату рождения) по его уникальному идентификатору.",
+    description="Обновляет данные автора (имя, фамилию или дату рождения) по его ID.",
     response_description="Обновленные данные автора."
 )
 def update_author(author_id: int, author_update: AuthorUpdate, db: Session = Depends(get_db)):
