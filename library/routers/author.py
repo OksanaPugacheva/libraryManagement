@@ -144,3 +144,31 @@ def update_author(author_id: int, author_update: AuthorUpdate, db: Session = Dep
     # Получаем обновленные данные
     db.refresh(author)
     return author
+
+
+@router.delete(
+    "/authors/{author_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    summary="Удаление автора",
+    description="Удаляет автора по его уникальному идентификатору. Если автор не найден, возвращает ошибку 404.",
+)
+def delete_author(author_id: int, db: Session = Depends(get_db)):
+    """
+    Удаление автора по ID.
+
+    - **author_id**: Уникальный идентификатор автора
+    """
+    # Поиск автора в базе данных
+    author = db.query(Author).filter(Author.id == author_id).first()
+
+    if not author:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Автор с указанным ID не найден."
+        )
+
+    # Удаление автора
+    db.delete(author)
+    db.commit()
+
+    return
