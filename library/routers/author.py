@@ -2,18 +2,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List
 from library.database import SessionLocal
-from library.models.models import Author
+from library.models.models import Author, Book
 from library.schemas.author import AuthorCreate, AuthorResponse, AuthorUpdate
+from library.database import get_db
 
 router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.post(
@@ -148,17 +141,14 @@ def update_author(author_id: int, author_update: AuthorUpdate, db: Session = Dep
 
 @router.delete(
     "/authors/{author_id}",
-    status_code=status.HTTP_204_NO_CONTENT,
+    status_code=status.HTTP_400_BAD_REQUEST,
     summary="Удаление автора",
-    description="Удаляет автора по его уникальному идентификатору. Если автор не найден, возвращает ошибку 404.",
+    description="Запрещает удаление автора, если у него есть связанные книги.",
 )
 def delete_author(author_id: int, db: Session = Depends(get_db)):
     """
-    Удаление автора по ID.
-
-    - **author_id**: Уникальный идентификатор автора
+    Запрещает удаление автора, если у него есть связанные книги.
     """
-    # Поиск автора в базе данных
     author = db.query(Author).filter(Author.id == author_id).first()
 
     if not author:
@@ -167,7 +157,15 @@ def delete_author(author_id: int, db: Session = Depends(get_db)):
             detail="Автор с указанным ID не найден."
         )
 
-    # Удаление автора
+    # Проверяем наличие книг у автора
+    books_count = db.query(Book).filter(Book.author_id == author_id).count()
+    if books_count > 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Невозможно удалить автора, у которого есть связанные книги."
+        )
+
+    # Удаляем автора
     db.delete(author)
     db.commit()
 
