@@ -42,3 +42,13 @@ FastAPI и SQLAlchemy (v2). Оно предоставляет RESTful эндпо
 Встроенная документация доступна по следующим адресам:
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
+
+## Использование Postman
+
+В проекте доступна коллекция базовых запросов Postman для тестирования API.
+
+1. Скачайте коллекцию из папки [`postman`](./postman/library_management_collection.json).
+2. Импортируйте коллекцию в Postman:
+   - Откройте Postman.
+   - Нажмите **Import** → **Upload Files** → выберите файл `library_management_collection.json`.
+3. Тестируйте API
