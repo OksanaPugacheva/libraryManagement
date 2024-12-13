@@ -82,20 +82,22 @@ def get_borrow(borrow_id: int, db: Session = Depends(get_db)):
     return borrow
 
 
-from datetime import datetime
-
 @router.patch(
     "/borrows/{borrow_id}/return",
     response_model=BorrowResponse,
     summary="Завершение выдачи",
     description="Завершает выдачу книги, увеличивая количество доступных экземпляров.",
 )
-def return_borrow(borrow_id: int, db: Session = Depends(get_db)):
+def return_borrow(
+        borrow_id: int,
+        return_data: BorrowReturn,
+        db: Session = Depends(get_db)
+):
     """
     Завершает выдачу книги.
 
     - Увеличивает количество доступных экземпляров книги.
-    - Устанавливает текущую дату и время как дату возврата.
+    - Устанавливает дату возврата, переданную в запросе.
     """
     # Находим запись о выдаче
     borrow = db.query(Borrow).filter(Borrow.id == borrow_id).first()
@@ -122,10 +124,9 @@ def return_borrow(borrow_id: int, db: Session = Depends(get_db)):
     else:
         book.available_copies += 1
 
-    # Устанавливаем текущую дату и время как дату возврата
-    borrow.return_date = datetime.utcnow()
+    # Устанавливаем дату возврата, переданную в запросе
+    borrow.return_date = return_data.return_date
     db.commit()
     db.refresh(borrow)
 
     return borrow
-

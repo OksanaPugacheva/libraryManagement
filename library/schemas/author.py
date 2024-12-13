@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 from datetime import date
 from typing import Optional
 
@@ -8,8 +8,7 @@ class AuthorCreate(BaseModel):
     last_name: str
     birth_date: date
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AuthorResponse(AuthorCreate):
@@ -18,8 +17,7 @@ class AuthorResponse(AuthorCreate):
     last_name: str
     birth_date: date
 
-    class Config:
-        orm_mode = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class AuthorUpdate(BaseModel):

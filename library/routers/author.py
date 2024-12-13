@@ -140,7 +140,7 @@ def update_author(author_id: int, author_update: AuthorUpdate, db: Session = Dep
 
 @router.delete(
     "/authors/{author_id}",
-    status_code=status.HTTP_400_BAD_REQUEST,
+    status_code=status.HTTP_204_NO_CONTENT,
     summary="Удаление автора",
     description="Запрещает удаление автора, если у него есть связанные книги.",
 )
@@ -148,15 +148,15 @@ def delete_author(author_id: int, db: Session = Depends(get_db)):
     """
     Запрещает удаление автора, если у него есть связанные книги.
     """
+    # Проверяем существование автора
     author = db.query(Author).filter(Author.id == author_id).first()
-
     if not author:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Автор с указанным ID не найден."
         )
 
-    # Проверяем наличие книг у автора
+    # Проверяем наличие связанных книг
     books_count = db.query(Book).filter(Book.author_id == author_id).count()
     if books_count > 0:
         raise HTTPException(
